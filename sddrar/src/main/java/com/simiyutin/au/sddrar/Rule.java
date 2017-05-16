@@ -1,4 +1,4 @@
-package com.sixrr.metrics.sddrar;
+package com.simiyutin.au.sddrar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -204,6 +204,14 @@ public class Rule implements Serializable {
             nodes.add(new Node(n));
         }
         return nodes;
+    }
+
+    public int firstAttribute() {
+        return body.get(0).getValue();
+    }
+
+    public int lastAttribute() {
+        return body.get(body.size() - 1).getValue();
     }
 
     boolean check(double[] entity) {

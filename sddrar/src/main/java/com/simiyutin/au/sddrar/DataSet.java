@@ -1,4 +1,4 @@
-package com.sixrr.metrics.sddrar;
+package com.simiyutin.au.sddrar;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;

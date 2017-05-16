@@ -1,4 +1,4 @@
-package com.sixrr.metrics.sddrar;
+package com.simiyutin.au.sddrar;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;

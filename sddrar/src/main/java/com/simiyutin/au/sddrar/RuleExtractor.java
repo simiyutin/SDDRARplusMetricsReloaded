@@ -1,4 +1,4 @@
-package com.sixrr.metrics.sddrar;
+package com.simiyutin.au.sddrar;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,28 +8,49 @@ public class RuleExtractor {
     //todo add confidence of rule to toString, e.g.: confidence=0.81
     public static Set<Rule> extractRules(DataSet dataSet, double minConfidence) {
 
+        log("number of entities = %s", dataSet.getEntityNames().size());
+        log("number of features = %s", dataSet.getFeatureNames().size());
+        log("min confidence = %s", minConfidence);
+
+        System.out.println(String.format("k = %s", 2));
         Set<Rule> candidates = findRulesOfSizeTwo(dataSet);
+        System.out.println(String.format("candidates size  = %s", candidates.size()));
         Set<Rule> newRules = filterByConfidence(candidates, minConfidence, dataSet);
         Set<Rule> resultRules = newRules;
+        System.out.println(String.format("result rules size = %s", resultRules.size()));
 
         int k = 3;
         int featuresNum = dataSet.getFeatureNames().size();
         while (!newRules.isEmpty() && k <= featuresNum) {
-            Map<Rule, Set<Rule>> newAndUsed = genCandidates(newRules);
-            candidates = newAndUsed.keySet();
+            System.out.println(String.format("k = %s", k));
+            Map<Rule, Set<Rule>> childrenAndParents = genCandidates(newRules);
+            candidates = childrenAndParents.keySet();
+            System.out.println(String.format("candidates size  = %s", candidates.size()));
 
             newRules = filterByConfidence(candidates, minConfidence, dataSet);
             for (Rule interestingRule : newRules) {
-                Set<Rule> usedAtProduction = newAndUsed.get(interestingRule);
+                Set<Rule> usedAtProduction = childrenAndParents.get(interestingRule);
                 if (usedAtProduction != null) {
                     resultRules.removeAll(usedAtProduction);
                 }
             }
+
             resultRules.addAll(newRules);
+            System.out.println(String.format("result rules size = %s", resultRules.size()));
             ++k;
         }
 
         return resultRules;
+    }
+
+    private static void printSorted(Set<Rule> rules) {
+        rules.stream()
+                .sorted(Comparator.comparingInt(r -> r.getBody().get(0).getValue()))
+                .forEach(System.out::println);
+    }
+
+    private static void log(String pattern, Object ... objects) {
+        System.out.println(String.format(pattern, objects));
     }
 
     private static void addToRulesMap(Map<Rule, Set<Rule>> rules, Rule newRule, Rule rule1, Rule rule2) {
@@ -68,19 +89,23 @@ public class RuleExtractor {
     }
 
     private static boolean candidate1(Rule rule1, Rule rule2) {
-        return rule1.cutLeft().equals(rule2.cutRight());
+        boolean differentAttributes = rule1.firstAttribute() != rule2.lastAttribute();
+        return differentAttributes && rule1.cutLeft().equals(rule2.cutRight());
     }
 
     private static boolean candidate2(Rule rule1, Rule rule2) {
-        return rule1.cutRight().equals(rule2.cutLeft());
+        boolean differentAttributes = rule1.lastAttribute() != rule2.firstAttribute();
+        return differentAttributes && rule1.cutRight().equals(rule2.cutLeft());
     }
 
     private static boolean candidate3(Rule rule1, Rule rule2) {
-        return rule1.cutLeft().equals(rule2.cutLeft().reversed());
+        boolean differentAttributes = rule1.firstAttribute() != rule2.firstAttribute();
+        return differentAttributes && rule1.cutLeft().equals(rule2.cutLeft().reversed());
     }
 
     private static boolean candidate4(Rule rule1, Rule rule2) {
-        return rule1.cutRight().equals(rule2.cutRight().reversed());
+        boolean differentAttributes = rule1.lastAttribute() != rule2.lastAttribute();
+        return differentAttributes && rule1.cutRight().equals(rule2.cutRight().reversed());
     }
 
     private static Rule create1(Rule rule1, Rule rule2) {
@@ -130,7 +155,7 @@ public class RuleExtractor {
                 .collect(Collectors.toSet());
     }
 
-    private static double getConfidence(Rule rule, DataSet dataSet) {
+    public static double getConfidence(Rule rule, DataSet dataSet) {
         int numberOfEntities = dataSet.getEntityNames().size();
         int numberOfSuccesses = 0;
         for (double[] entity : dataSet.getMatrix().getData()) {

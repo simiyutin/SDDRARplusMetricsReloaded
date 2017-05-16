@@ -1,4 +1,4 @@
-package com.sixrr.metrics.sddrar;
+package com.simiyutin.au.sddrar;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -44,9 +44,15 @@ public class CorrelationFilter {
         assert correlations.getColumnDimension() == correlations.getRowDimension();
         assert correlations.getRowDimension() == dataSet.getColumnDimension();
 
+
         double[] avg = new double[correlations.getRowDimension()];
         for (int i = 0; i < correlations.getRowDimension(); i++) {
-            avg[i] = (new Sum().evaluate(correlations.getData()[i]) - 1) / (correlations.getRowDimension() - 1);
+            double[] row = correlations.getData()[i];
+            double[] absRow = new double[row.length];
+            for (int j = 0; j < row.length; j++) {
+                absRow[j] = Math.abs(row[j]);
+            }
+            avg[i] = (new Sum().evaluate(absRow) - 1) / (correlations.getRowDimension() - 1);
         }
         return avg;
     }

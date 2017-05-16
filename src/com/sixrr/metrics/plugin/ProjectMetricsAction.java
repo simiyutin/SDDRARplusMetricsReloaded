@@ -31,16 +31,13 @@ import com.sixrr.metrics.metricModel.MetricsRunImpl;
 import com.sixrr.metrics.metricModel.TimeStamp;
 import com.sixrr.metrics.profile.MetricsProfile;
 import com.sixrr.metrics.profile.MetricsProfileRepository;
-import com.sixrr.metrics.sddrar.CorrelationFilter;
-import com.sixrr.metrics.sddrar.DataSet;
-import com.sixrr.metrics.sddrar.Rule;
-import com.sixrr.metrics.sddrar.RuleExtractor;
 import com.sixrr.metrics.ui.dialogs.ProfileSelectionPanel;
 import com.sixrr.metrics.ui.metricdisplay.MetricsToolWindow;
 import com.sixrr.metrics.utils.MetricsReloadedBundle;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import com.simiyutin.au.sddrar.*;
 
 import javax.swing.*;
 import java.io.FileNotFoundException;
