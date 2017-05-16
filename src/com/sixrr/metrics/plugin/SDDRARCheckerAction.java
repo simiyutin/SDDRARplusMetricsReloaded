@@ -45,10 +45,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ProjectMetricsAction extends BaseAnalysisAction {
+public class SDDRARCheckerAction extends BaseAnalysisAction {
 
-    public ProjectMetricsAction() {
-        super(MetricsReloadedBundle.message("metrics.calculation"), MetricsReloadedBundle.message("metrics"));
+    public SDDRARCheckerAction() {
+        super("ANALYZE CODE", "SDDRAR");
     }
 
     @Override
@@ -71,15 +71,16 @@ public class ProjectMetricsAction extends BaseAnalysisAction {
                 metricsRun.setProfileName(profileName);
                 metricsRun.setContext(analysisScope);
                 metricsRun.setTimestamp(new TimeStamp());
-                dumpForSDDRAR(metricsRun);
+                List<String> faulty = checkWithSDDRAR(metricsRun);
+                System.out.println(String.format("faulty classes: %s", faulty));
                 toolWindow.show(metricsRun, profile, analysisScope, showOnlyWarnings);
             }
         }.execute(profile, metricsRun);
     }
 
-    private void dumpForSDDRAR(MetricsRunImpl metricsRun) {
+    private List<String> checkWithSDDRAR(MetricsRunImpl metricsRun) {
         DataSet dataSet = extractDataSet(metricsRun);
-        SDDRARFacade.trainAndPersistModel(dataSet);
+        return SDDRARFacade.checkNewData(dataSet);
     }
 
     private DataSet extractDataSet(MetricsRunImpl metricsRun) {

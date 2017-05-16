@@ -25,7 +25,7 @@ public class Rule implements Serializable {
         }
     }
 
-    public static class Node {
+    public static class Node implements Serializable {
         private Type type;
         private int value;
 

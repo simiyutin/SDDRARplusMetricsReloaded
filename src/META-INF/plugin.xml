@@ -70,6 +70,8 @@
     <group>
       <action id="Metrics.ProjectMetricsAction" class="com.sixrr.metrics.plugin.ProjectMetricsAction"
               text="Calculate Metrics..."/>
+      <action id="Metrics.SDDRARCheckerAction" class="com.sixrr.metrics.plugin.SDDRARCheckerAction"
+              text="Analyze with SDDRAR..."/>
       <!--action id="Metrics.ViewOfflineMetricsResults"
               class="com.sixrr.metrics.offline.ViewOfflineMetricsResultsAction"
               text="View Offline Metrics Results...">

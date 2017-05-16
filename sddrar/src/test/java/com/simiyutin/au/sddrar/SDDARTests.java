@@ -72,13 +72,13 @@ public class SDDARTests {
     public void testDumpLoad() {
         DataSet dataSet = createSimpleDataSet();
         SDDRARioHandler.dump(dataSet, "test");
-        DataSet deserialized = SDDRARioHandler.load("test");
+        DataSet deserialized = SDDRARioHandler.loadDataSet("test");
         Assert.assertEquals(dataSet.getMatrix().getData(), deserialized.getMatrix().getData());
     }
 
     @Test
     public void testForeignDataSetExtraction() {
-        DataSet dataSet = SDDRARioHandler.load("dataset.dat");
+        DataSet dataSet = SDDRARioHandler.loadDataSet("dataset.dat");
         System.out.println(dataSet.getEntityNames().size());
         CorrelationFilter.filterByFeatureCorrelationRate(dataSet);
         Set<Rule> rules = RuleExtractor.extractRules(dataSet, 0.8);
