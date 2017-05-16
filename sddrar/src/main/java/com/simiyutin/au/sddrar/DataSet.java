@@ -3,10 +3,11 @@ package com.simiyutin.au.sddrar;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataSet {
+public class DataSet implements Serializable {
     private RealMatrix data;
     private List<String> entityNames;
     private List<String> featureNames;

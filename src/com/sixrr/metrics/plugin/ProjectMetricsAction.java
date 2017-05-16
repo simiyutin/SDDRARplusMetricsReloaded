@@ -22,6 +22,7 @@ import com.intellij.analysis.BaseAnalysisActionDialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.simiyutin.au.sddrar.SDDRARioHandler;
 import com.sixrr.metrics.Metric;
 import com.sixrr.metrics.MetricCategory;
 import com.sixrr.metrics.config.MetricsReloadedConfig;
@@ -40,14 +41,9 @@ import org.jetbrains.annotations.Nullable;
 import com.simiyutin.au.sddrar.*;
 
 import javax.swing.*;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class ProjectMetricsAction extends BaseAnalysisAction {
 
@@ -75,26 +71,15 @@ public class ProjectMetricsAction extends BaseAnalysisAction {
                 metricsRun.setProfileName(profileName);
                 metricsRun.setContext(analysisScope);
                 metricsRun.setTimestamp(new TimeStamp());
-                runSDDRAR(metricsRun);
+                dumpForSDDRAR(metricsRun);
                 toolWindow.show(metricsRun, profile, analysisScope, showOnlyWarnings);
             }
         }.execute(profile, metricsRun);
     }
 
-    private void runSDDRAR(MetricsRunImpl metricsRun) {
+    private void dumpForSDDRAR(MetricsRunImpl metricsRun) {
         DataSet dataSet = extractDataSet(metricsRun);
-        try {
-            FileOutputStream fos = new FileOutputStream("/home/boris/au_2/nir/project/data/dataset.dat");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(dataSet.getMatrix().getData());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-//        CorrelationFilter.filterByFeatureCorrelationRate(dataSet);
-//        Set<Rule> rules = RuleExtractor.extractRules(dataSet, 0.95);
-//        System.out.println(rules);
+        SDDRARioHandler.dump(dataSet, metricsRun.getProfileName());
     }
 
     private DataSet extractDataSet(MetricsRunImpl metricsRun) {

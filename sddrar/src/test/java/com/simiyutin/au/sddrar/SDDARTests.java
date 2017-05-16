@@ -1,7 +1,5 @@
 package com.simiyutin.au.sddrar;
 
-import com.simiyutin.au.sddrar.*;
-import com.simiyutin.au.sddrar_service.IOHandler;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -73,14 +71,14 @@ public class SDDARTests {
     @Test
     public void testDumpLoad() {
         DataSet dataSet = createSimpleDataSet();
-        IOHandler.dump(dataSet, "test");
-        DataSet deserialized = IOHandler.load("test");
+        SDDRARioHandler.dump(dataSet, "test");
+        DataSet deserialized = SDDRARioHandler.load("test");
         Assert.assertEquals(dataSet.getMatrix().getData(), deserialized.getMatrix().getData());
     }
 
     @Test
     public void testForeignDataSetExtraction() {
-        DataSet dataSet = IOHandler.load("dataset.dat");
+        DataSet dataSet = SDDRARioHandler.load("dataset.dat");
         System.out.println(dataSet.getEntityNames().size());
         CorrelationFilter.filterByFeatureCorrelationRate(dataSet);
         Set<Rule> rules = RuleExtractor.extractRules(dataSet, 0.8);
