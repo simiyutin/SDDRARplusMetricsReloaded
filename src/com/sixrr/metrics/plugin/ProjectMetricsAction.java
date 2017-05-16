@@ -22,19 +22,35 @@ import com.intellij.analysis.BaseAnalysisActionDialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.sixrr.metrics.Metric;
+import com.sixrr.metrics.MetricCategory;
 import com.sixrr.metrics.config.MetricsReloadedConfig;
 import com.sixrr.metrics.metricModel.MetricsExecutionContextImpl;
+import com.sixrr.metrics.metricModel.MetricsResult;
 import com.sixrr.metrics.metricModel.MetricsRunImpl;
 import com.sixrr.metrics.metricModel.TimeStamp;
 import com.sixrr.metrics.profile.MetricsProfile;
 import com.sixrr.metrics.profile.MetricsProfileRepository;
+import com.sixrr.metrics.sddrar.CorrelationFilter;
+import com.sixrr.metrics.sddrar.DataSet;
+import com.sixrr.metrics.sddrar.Rule;
+import com.sixrr.metrics.sddrar.RuleExtractor;
 import com.sixrr.metrics.ui.dialogs.ProfileSelectionPanel;
 import com.sixrr.metrics.ui.metricdisplay.MetricsToolWindow;
 import com.sixrr.metrics.utils.MetricsReloadedBundle;
+import org.apache.commons.math3.linear.MatrixUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 public class ProjectMetricsAction extends BaseAnalysisAction {
 
@@ -62,9 +78,51 @@ public class ProjectMetricsAction extends BaseAnalysisAction {
                 metricsRun.setProfileName(profileName);
                 metricsRun.setContext(analysisScope);
                 metricsRun.setTimestamp(new TimeStamp());
+                runSDDRAR(metricsRun);
                 toolWindow.show(metricsRun, profile, analysisScope, showOnlyWarnings);
             }
         }.execute(profile, metricsRun);
+    }
+
+    private void runSDDRAR(MetricsRunImpl metricsRun) {
+        DataSet dataSet = extractDataSet(metricsRun);
+        try {
+            FileOutputStream fos = new FileOutputStream("/home/boris/au_2/nir/project/data/dataset.dat");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(dataSet.getMatrix().getData());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        CorrelationFilter.filterByFeatureCorrelationRate(dataSet);
+//        Set<Rule> rules = RuleExtractor.extractRules(dataSet, 0.95);
+//        System.out.println(rules);
+    }
+
+    private DataSet extractDataSet(MetricsRunImpl metricsRun) {
+
+        MetricsResult result = metricsRun.getResultsForCategory(MetricCategory.Class);
+        List<String> entityNames = Arrays.asList(result.getMeasuredObjects());
+        List<String> featureNames = new ArrayList<>();
+        for (Metric metric : result.getMetrics()) {
+            featureNames.add(metric.getAbbreviation());
+        }
+
+        Metric[] metrics = result.getMetrics();
+
+        double[][] data = new double[entityNames.size()][featureNames.size()];
+        for (int i = 0; i < entityNames.size(); i++) {
+            for (int j = 0; j < featureNames.size(); j++) {
+                Metric metric = metrics[j];
+                String entity = entityNames.get(i);
+                Double value = result.getValueForMetric(metric, entity);
+                data[i][j] = value == null ? 0 : value;
+            }
+        }
+
+        DataSet dataSet = new DataSet(MatrixUtils.createRealMatrix(data), entityNames, featureNames);
+        return dataSet;
     }
 
     @Override

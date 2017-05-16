@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module relativePaths="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/build/classes" />
     <output-test url="file://$MODULE_DIR$/build/testclasses" />
     <exclude-output />
@@ -14,5 +14,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="openapi" />
     <orderEntry type="module" module-name="utils" />
+    <orderEntry type="module" module-name="MetricsReloaded" />
+    <orderEntry type="module" module-name="utils" />
+    <orderEntry type="module" module-name="openapi" />
   </component>
 </module>
