@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class SDDRARFacade {
     private static final double MIN_CONFIDENCE = 0.8;
-    private static final double PERCENTAGE_OF_ERROR_THRESHOLD = 0.5;
+    private static final double PERCENTAGE_OF_ERROR_THRESHOLD = 0.9;
 
     public static void trainAndPersistModel(MetricsProfile profile, MetricsRun metricsRun) {
         DataSet dataSet = extractDataSet(metricsRun);

@@ -2,6 +2,8 @@ package com.simiyutin.au.sddrar;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.stat.descriptive.rank.Max;
+import org.apache.commons.math3.stat.descriptive.rank.Min;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +15,8 @@ public class DataSet implements Serializable {
     private List<String> featureNames;
 
     public DataSet(RealMatrix data, List<String> entityNames, List<String> featureNames) {
-        this.data = data;
+        this.data = data.copy();
+        normalizeColumns(this.data);
         this.entityNames = entityNames;
         this.featureNames = featureNames;
     }
@@ -60,5 +63,33 @@ public class DataSet implements Serializable {
 
     public void setFeatureNames(List<String> featureNames) {
         this.featureNames = featureNames;
+    }
+
+    private void normalizeColumns(RealMatrix matrix) {
+        for (int i = 0; i < matrix.getColumnDimension(); i++) {
+            double[] column = matrix.getColumn(i);
+            matrix.setColumn(i, normalizeMax(column));
+        }
+    }
+
+    private double[] normalizeMax(double[] data) {
+        double max = new Max().evaluate(data);
+        double min = new Min().evaluate(data);
+        double[] res = new double[data.length];
+        if (max > min) {
+            for (int i = 0; i < data.length; i++) {
+                res[i] = (data[i] - min) / (max - min);
+            }
+        } else if (max != 0) {
+            for (int i = 0; i < data.length; i++) {
+                res[i] = data[i] / max;
+            }
+        } else {
+            for (int i = 0; i < data.length; i++) {
+                res[i] = 0;
+            }
+        }
+
+        return res;
     }
 }
