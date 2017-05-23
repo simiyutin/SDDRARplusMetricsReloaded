@@ -19,7 +19,7 @@ package com.sixrr.stockmetrics;
 import com.sixrr.metrics.Metric;
 import com.sixrr.metrics.MetricProvider;
 import com.sixrr.metrics.PrebuiltMetricProfile;
-import com.sixrr.stockmetrics.classMetrics.SourceLinesOfCodeClassMetric;
+import com.sixrr.stockmetrics.classMetrics.*;
 import com.sixrr.stockmetrics.fileTypeMetrics.*;
 import com.sixrr.stockmetrics.i18n.StockMetricsBundle;
 import com.sixrr.stockmetrics.interfaceMetrics.SourceLinesOfCodeInterfaceMetric;
@@ -98,6 +98,7 @@ public class DefaultMetricProvider implements MetricProvider {
         final List<PrebuiltMetricProfile> out = new ArrayList<PrebuiltMetricProfile>(2);
         out.add(createCodeSizeProfile());
         out.add(createFileCountProfile());
+        out.add(createSDDRARProfile());
         return out;
     }
 
@@ -135,6 +136,23 @@ public class DefaultMetricProvider implements MetricProvider {
         profile.addMetric(NumHTMLFilesProjectMetric.class);
         profile.addMetric(NumXMLFilesModuleMetric.class);
         profile.addMetric(NumXMLFilesProjectMetric.class);
+        return profile;
+    }
+
+    private static PrebuiltMetricProfile createSDDRARProfile() {
+        final PrebuiltMetricProfile profile =
+                new PrebuiltMetricProfile("SDDRAR metrics");
+
+        profile.addMetric(CouplingBetweenObjectsClassMetric.class);
+        profile.addMetric(LackOfCohesionOfMethodsClassMetric.class);
+        profile.addMetric(NumAttributesAddedMetric.class);
+        profile.addMetric(NumAttributesInheritedMetric.class);
+        profile.addMetric(NumAttributesInheritedMetric.class);
+        profile.addMetric(NumCommandsClassMetric.class);
+        profile.addMetric(NumOperationsAddedMetric.class);
+        profile.addMetric(NumOperationsInheritedMetric.class);
+        profile.addMetric(ResponseForClassMetric.class);
+
         return profile;
     }
 }
