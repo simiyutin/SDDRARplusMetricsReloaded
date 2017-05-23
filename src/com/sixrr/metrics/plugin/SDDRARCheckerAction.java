@@ -65,7 +65,7 @@ public class SDDRARCheckerAction extends BaseAnalysisAction {
                 metricsRun.setContext(analysisScope);
                 metricsRun.setTimestamp(new TimeStamp());
                 List<String> faulty = SDDRARFacade.checkNewData(metricsRun);
-                System.out.println(String.format("faulty classes: %s", faulty));
+                metricsRun.markFaultyClasses(faulty);
                 toolWindow.show(metricsRun, profile, analysisScope, showOnlyWarnings);
             }
         }.execute(profile, metricsRun);

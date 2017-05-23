@@ -60,6 +60,106 @@ public class MetricsRunImpl implements MetricsRun {
         }
     }
 
+    @NotNull
+    private static String getFileTypeString(FileType fileType) {
+        final String description = fileType.getDescription();
+        return StringUtil.trimEnd(StringUtil.trimEnd(StringUtil.trimEnd(StringUtil.trimEnd(description,
+                " (syntax highlighting only)"), " files"), " Files"), " source");
+    }
+
+    private static void writeResultsForMetric(Metric metric, MetricsResult results, XMLStreamWriter writer)
+            throws XMLStreamException {
+        final Class<?> metricClass = metric.getClass();
+        final String[] measuredObjects = results.getMeasuredObjects();
+        writer.writeCharacters("  ");
+        writer.writeStartElement("METRIC");
+        writer.writeAttribute("class_name", metricClass.getName());
+        writer.writeCharacters("\n");
+        for (final String measuredObject : measuredObjects) {
+            writeValue(results, metric, measuredObject, writer);
+        }
+        writer.writeCharacters("  ");
+        writer.writeEndElement();
+        writer.writeCharacters("\n");
+    }
+
+    private static void writeValue(MetricsResult results, Metric metric, String measuredObject, XMLStreamWriter writer)
+            throws XMLStreamException {
+        final Double value = results.getValueForMetric(metric, measuredObject);
+        if (value != null) {
+            writer.writeCharacters("    ");
+            writer.writeEmptyElement("VALUE");
+            writer.writeAttribute("measured", measuredObject);
+            writer.writeAttribute("value", value.toString());
+            writer.writeCharacters("\n");
+        }
+    }
+
+    public static MetricsRun readFromFile(@NotNull File file) {
+        final SAXBuilder builder = new SAXBuilder();
+        Document doc;
+        try {
+            doc = builder.build(file);
+        } catch (Exception e) {
+            try {
+                doc = builder.build(fixBrokenXml(file));
+            } catch (Exception e1) {
+                logger.warn(e);
+                return null;
+            }
+        }
+        final Element snapshotElement = doc.getRootElement();
+        final MetricsRunImpl run = new MetricsRunImpl();
+        run.setTimestamp(new TimeStamp(snapshotElement.getAttributeValue("timestamp")));
+        run.setProfileName(snapshotElement.getAttributeValue("profile"));
+        final String version = snapshotElement.getAttributeValue("version"); // may need this later
+        final List<Element> metrics = snapshotElement.getChildren("METRIC");
+        final MetricRepository repository = MetricsProfileRepository.getInstance();
+        for (final Element metricElement : metrics) {
+            readMetricElement(metricElement, repository, run);
+        }
+        return run;
+    }
+
+    @NotNull
+    private static Reader fixBrokenXml(@NotNull File file) throws IOException {
+        final String s = FileUtilRt.loadFile(file);
+        final StringBuilder sb = new StringBuilder();
+        boolean insideQuotes = false;
+        for (int i = 0, length = s.length(); i < length; i++) {
+            final int c = s.codePointAt(i);
+            if (c == '"') {
+                insideQuotes = !insideQuotes;
+                sb.appendCodePoint(c);
+            } else if (!insideQuotes) {
+                sb.appendCodePoint(c);
+            } else if (c == '<') {
+                sb.append("&lt;");
+            } else {
+                sb.appendCodePoint(c);
+            }
+        }
+        return new StringReader(sb.toString());
+    }
+
+    private static void readMetricElement(Element metricElement, MetricRepository repository, MetricsRunImpl run) {
+        try {
+            final String className = metricElement.getAttributeValue("class_name");
+            final Metric metric = repository.getMetric(className);
+            if (metric != null) {
+                final List<Element> values = metricElement.getChildren("VALUE");
+                for (final Element valueElement : values) {
+                    final String measured = valueElement.getAttributeValue("measured");
+                    final String valueString = valueElement.getAttributeValue("value");
+                    final double value = Double.parseDouble(valueString);
+                    run.postRawMetric(metric, measured, value);
+                }
+            }
+        } catch (Exception e) {
+            logger.warn(e);
+        }
+    }
+
     @Override
     public List<Metric> getMetrics() {
         final Set<Metric> allMetrics = new HashSet<Metric>();
@@ -69,13 +169,6 @@ public class MetricsRunImpl implements MetricsRun {
             allMetrics.addAll(Arrays.asList(metrics));
         }
         return new ArrayList<Metric>(allMetrics);
-    }
-
-    @NotNull
-    private static String getFileTypeString(FileType fileType) {
-        final String description = fileType.getDescription();
-        return StringUtil.trimEnd(StringUtil.trimEnd(StringUtil.trimEnd(StringUtil.trimEnd(description,
-                " (syntax highlighting only)"), " files"), " Files"), " source");
     }
 
     @Override
@@ -233,22 +326,24 @@ public class MetricsRunImpl implements MetricsRun {
         this.profileName = profileName;
     }
 
-    public void setContext(AnalysisScope context) {
-        this.context = context;
+    @Override
+    public TimeStamp getTimestamp() {
+        return timestamp;
     }
+
+    ;
 
     public void setTimestamp(TimeStamp timestamp) {
         this.timestamp = timestamp;
     }
 
     @Override
-    public TimeStamp getTimestamp() {
-        return timestamp;
-    }
-
-    @Override
     public AnalysisScope getContext() {
         return context;
+    }
+
+    public void setContext(AnalysisScope context) {
+        this.context = context;
     }
 
     @Override
@@ -268,106 +363,23 @@ public class MetricsRunImpl implements MetricsRun {
         return out;
     }
 
+    public void markFaultyClasses(List<String> faulty) {
+        final Set<MetricCategory> categories = metricResults.keySet();
+        for (MetricCategory category : categories) {
+            if (category != MetricCategory.Class) {
+                continue;
+            }
+            MetricsResultImpl results = (MetricsResultImpl) getResultsForCategory(category);
+            final MetricsResult filteredResults = results.markRowsWithPrefix(faulty, "<faulty>");
+            setResultsForCategory(category, filteredResults);
+        }
+    }
+
     private void writeResultsForCategory(MetricCategory category, XMLStreamWriter writer) throws XMLStreamException {
         final MetricsResult results = getResultsForCategory(category);
         final Metric[] metrics = results.getMetrics();
         for (final Metric metric : metrics) {
             writeResultsForMetric(metric, results, writer);
-        }
-    }
-
-    private static void writeResultsForMetric(Metric metric, MetricsResult results, XMLStreamWriter writer)
-            throws XMLStreamException {
-        final Class<?> metricClass = metric.getClass();
-        final String[] measuredObjects = results.getMeasuredObjects();
-        writer.writeCharacters("  ");
-        writer.writeStartElement("METRIC");
-        writer.writeAttribute("class_name", metricClass.getName());
-        writer.writeCharacters("\n");
-        for (final String measuredObject : measuredObjects) {
-            writeValue(results, metric, measuredObject, writer);
-        }
-        writer.writeCharacters("  ");
-        writer.writeEndElement();
-        writer.writeCharacters("\n");
-    }
-
-    private static void writeValue(MetricsResult results, Metric metric, String measuredObject, XMLStreamWriter writer)
-            throws XMLStreamException {
-        final Double value = results.getValueForMetric(metric, measuredObject);
-        if (value != null) {
-            writer.writeCharacters("    ");
-            writer.writeEmptyElement("VALUE");
-            writer.writeAttribute("measured", measuredObject);
-            writer.writeAttribute("value", value.toString());
-            writer.writeCharacters("\n");
-        }
-    }
-
-    public static MetricsRun readFromFile(@NotNull File file) {
-        final SAXBuilder builder = new SAXBuilder();
-        Document doc;
-        try {
-            doc = builder.build(file);
-        } catch (Exception e) {
-            try {
-                doc = builder.build(fixBrokenXml(file));
-            } catch (Exception e1) {
-                logger.warn(e);
-                return null;
-            }
-        }
-        final Element snapshotElement = doc.getRootElement();
-        final MetricsRunImpl run = new MetricsRunImpl();
-        run.setTimestamp(new TimeStamp(snapshotElement.getAttributeValue("timestamp")));
-        run.setProfileName(snapshotElement.getAttributeValue("profile"));
-        final String version = snapshotElement.getAttributeValue("version"); // may need this later
-        final List<Element> metrics = snapshotElement.getChildren("METRIC");
-        final MetricRepository repository = MetricsProfileRepository.getInstance();
-        for (final Element metricElement : metrics) {
-            readMetricElement(metricElement, repository, run);
-        }
-        return run;
-    }
-
-    @NotNull
-    private static Reader fixBrokenXml(@NotNull File file) throws IOException {
-        final String s = FileUtilRt.loadFile(file);
-        final StringBuilder sb = new StringBuilder();
-        boolean insideQuotes = false;
-        for (int i = 0, length = s.length(); i < length; i++) {
-            final int c = s.codePointAt(i);
-            if (c == '"') {
-                insideQuotes = !insideQuotes;
-                sb.appendCodePoint(c);
-            }
-            else if (!insideQuotes) {
-                sb.appendCodePoint(c);
-            }
-            else if (c == '<') {
-                sb.append("&lt;");
-            } else {
-                sb.appendCodePoint(c);
-            }
-        }
-        return new StringReader(sb.toString());
-    }
-
-    private static void readMetricElement(Element metricElement, MetricRepository repository, MetricsRunImpl run) {
-        try {
-            final String className = metricElement.getAttributeValue("class_name");
-            final Metric metric = repository.getMetric(className);
-            if (metric != null) {
-                final List<Element> values = metricElement.getChildren("VALUE");
-                for (final Element valueElement : values) {
-                    final String measured = valueElement.getAttributeValue("measured");
-                    final String valueString = valueElement.getAttributeValue("value");
-                    final double value = Double.parseDouble(valueString);
-                    run.postRawMetric(metric, measured, value);
-                }
-            }
-        } catch (Exception e) {
-            logger.warn(e);
         }
     }
 
