@@ -22,10 +22,7 @@ import com.sixrr.metrics.PrebuiltMetricProfile;
 import com.sixrr.stockmetrics.classMetrics.*;
 import com.sixrr.stockmetrics.fileTypeMetrics.*;
 import com.sixrr.stockmetrics.i18n.StockMetricsBundle;
-import com.sixrr.stockmetrics.interfaceMetrics.SourceLinesOfCodeInterfaceMetric;
-import com.sixrr.stockmetrics.methodMetrics.SourceLinesOfCodeMethodMetric;
 import com.sixrr.stockmetrics.moduleMetrics.*;
-import com.sixrr.stockmetrics.packageMetrics.*;
 import com.sixrr.stockmetrics.projectMetrics.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,16 +31,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class DefaultMetricProvider implements MetricProvider {
-
-    @NotNull
-    @Override
-    public List<Metric> getMetrics() {
-        final List<Metric> metrics = new ArrayList<Metric>(38);
-        initializeFileTypeMetrics(metrics);
-        initializeModuleMetrics(metrics);
-        initializeProjectMetrics(metrics);
-        return metrics;
-    }
 
     private static void initializeFileTypeMetrics(Collection<Metric> metrics) {
         metrics.add(new CommentLinesOfCodeFileTypeMetric());
@@ -90,16 +77,6 @@ public class DefaultMetricProvider implements MetricProvider {
         metrics.add(new TestRatioProjectMetric());
         metrics.add(new TodoCommentCountProjectMetric());
         metrics.add(new TrueCommentRatioProjectMetric());
-    }
-
-    @NotNull
-    @Override
-    public List<PrebuiltMetricProfile> getPrebuiltProfiles() {
-        final List<PrebuiltMetricProfile> out = new ArrayList<PrebuiltMetricProfile>(2);
-        out.add(createCodeSizeProfile());
-        out.add(createFileCountProfile());
-        out.add(createSDDRARProfile());
-        return out;
     }
 
     private static PrebuiltMetricProfile createCodeSizeProfile() {
@@ -153,6 +130,39 @@ public class DefaultMetricProvider implements MetricProvider {
         profile.addMetric(NumOperationsInheritedMetric.class);
         profile.addMetric(ResponseForClassMetric.class);
 
+        ////////////////////////
+
+        profile.addMetric(NumConstructorsMetric.class);
+        profile.addMetric(AdjustedLevelOrderClassMetric.class);
+        profile.addMetric(LevelOrderClassMetric.class);
+        profile.addMetric(NumOperationsOverriddenMetric.class);
+        profile.addMetric(AverageOperationParametersMetric.class);
+        profile.addMetric(AverageOperationComplexityMetric.class);
+        profile.addMetric(NumDependenciesClassMetric.class);
+        profile.addMetric(NumDependentsClassMetric.class);
+
+
+
         return profile;
+    }
+
+    @NotNull
+    @Override
+    public List<Metric> getMetrics() {
+        final List<Metric> metrics = new ArrayList<Metric>(38);
+        initializeFileTypeMetrics(metrics);
+        initializeModuleMetrics(metrics);
+        initializeProjectMetrics(metrics);
+        return metrics;
+    }
+
+    @NotNull
+    @Override
+    public List<PrebuiltMetricProfile> getPrebuiltProfiles() {
+        final List<PrebuiltMetricProfile> out = new ArrayList<PrebuiltMetricProfile>(2);
+        out.add(createCodeSizeProfile());
+        out.add(createFileCountProfile());
+        out.add(createSDDRARProfile());
+        return out;
     }
 }
