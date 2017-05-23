@@ -2,13 +2,12 @@ package com.simiyutin.au.sddrar;
 
 import java.io.*;
 import java.util.List;
-import java.util.Set;
 
 public class SDDRARioHandler {
 
     public static final String RULES_FILE = "rules.data";
     public static final String METRICS_FILE = "metrics.data";
-    private static final String DATA_FOLDER = "/home/boris/au_2/nir/project/data/";
+    private static final String DATA_FOLDER = SDDRARioHandler.class.getResource("/data/").getPath();
 
     public static void dumpRulePack(RulePack pack) {
         dump(pack, RULES_FILE);
