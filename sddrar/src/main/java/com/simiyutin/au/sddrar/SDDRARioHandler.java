@@ -1,27 +1,42 @@
 package com.simiyutin.au.sddrar;
 
-import com.simiyutin.au.sddrar.DataSet;
-
 import java.io.*;
+import java.util.List;
 import java.util.Set;
 
 public class SDDRARioHandler {
 
-    public static void dumpRules(Set<Rule> rules) {
-        dump(rules, "rules.dat");
-    }
+    public static final String RULES_FILE = "rules.data";
+    public static final String METRICS_FILE = "metrics.data";
+    private static final String DATA_FOLDER = "/home/boris/au_2/nir/project/data/";
 
-    public static DataSet loadDataSet(String name) {
-        return loadAnything(name);
+    public static void dumpRules(Set<Rule> rules) {
+        dump(rules, RULES_FILE);
     }
 
     public static Set<Rule> loadRules() {
-        return loadAnything("rules.dat");
+        return load(RULES_FILE);
+    }
+
+    public static void dumpMetrics(List<String> metrics) {
+        dump(metrics, METRICS_FILE);
+    }
+
+    public static List<String> loadMetrics() {
+        return load(METRICS_FILE);
+    }
+
+    public static void dumpDataSet(DataSet dataSet, String name) {
+        dump(dataSet, name);
+    }
+
+    public static DataSet loadDataSet(String name) {
+        return load(name);
     }
 
     public static void dump(Object obj, String name) {
         try {
-            FileOutputStream fos = new FileOutputStream("/home/boris/au_2/nir/project/data/" + name);
+            FileOutputStream fos = new FileOutputStream(DATA_FOLDER + name);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(obj);
         } catch (FileNotFoundException e) {
@@ -31,9 +46,9 @@ public class SDDRARioHandler {
         }
     }
 
-    private static <T> T loadAnything(String name) {
+    public static <T> T load(String name) {
         try {
-            FileInputStream fis = new FileInputStream("/home/boris/au_2/nir/project/data/" + name);
+            FileInputStream fis = new FileInputStream(DATA_FOLDER + name);
             ObjectInputStream ois = new ObjectInputStream(fis);
             T obj = (T) ois.readObject();
             return obj;

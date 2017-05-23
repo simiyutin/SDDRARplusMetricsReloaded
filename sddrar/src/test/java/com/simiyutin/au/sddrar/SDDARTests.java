@@ -71,7 +71,7 @@ public class SDDARTests {
     @Test
     public void testDumpLoad() {
         DataSet dataSet = createSimpleDataSet();
-        SDDRARioHandler.dump(dataSet, "test");
+        SDDRARioHandler.dumpDataSet(dataSet, "test");
         DataSet deserialized = SDDRARioHandler.loadDataSet("test");
         Assert.assertEquals(dataSet.getMatrix().getData(), deserialized.getMatrix().getData());
     }

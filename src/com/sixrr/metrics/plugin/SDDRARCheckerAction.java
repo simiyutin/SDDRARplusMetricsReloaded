@@ -22,12 +22,8 @@ import com.intellij.analysis.BaseAnalysisActionDialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.simiyutin.au.sddrar.SDDRARioHandler;
-import com.sixrr.metrics.Metric;
-import com.sixrr.metrics.MetricCategory;
 import com.sixrr.metrics.config.MetricsReloadedConfig;
 import com.sixrr.metrics.metricModel.MetricsExecutionContextImpl;
-import com.sixrr.metrics.metricModel.MetricsResult;
 import com.sixrr.metrics.metricModel.MetricsRunImpl;
 import com.sixrr.metrics.metricModel.TimeStamp;
 import com.sixrr.metrics.profile.MetricsProfile;
@@ -35,14 +31,10 @@ import com.sixrr.metrics.profile.MetricsProfileRepository;
 import com.sixrr.metrics.ui.dialogs.ProfileSelectionPanel;
 import com.sixrr.metrics.ui.metricdisplay.MetricsToolWindow;
 import com.sixrr.metrics.utils.MetricsReloadedBundle;
-import org.apache.commons.math3.linear.MatrixUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.simiyutin.au.sddrar.*;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SDDRARCheckerAction extends BaseAnalysisAction {
@@ -55,6 +47,7 @@ public class SDDRARCheckerAction extends BaseAnalysisAction {
     protected void analyze(@NotNull final Project project, @NotNull final AnalysisScope analysisScope) {
         final MetricsProfileRepository repository = MetricsProfileRepository.getInstance();
         final MetricsProfile profile = repository.getCurrentProfile();
+        SDDRARFacade.selectInterestingMetrics(profile);
         final MetricsToolWindow toolWindow = MetricsToolWindow.getInstance(project);
         final MetricsRunImpl metricsRun = new MetricsRunImpl();
         new MetricsExecutionContextImpl(project, analysisScope) {
@@ -71,41 +64,12 @@ public class SDDRARCheckerAction extends BaseAnalysisAction {
                 metricsRun.setProfileName(profileName);
                 metricsRun.setContext(analysisScope);
                 metricsRun.setTimestamp(new TimeStamp());
-                List<String> faulty = checkWithSDDRAR(metricsRun);
+                List<String> faulty = SDDRARFacade.checkNewData(metricsRun);
                 System.out.println(String.format("faulty classes: %s", faulty));
                 toolWindow.show(metricsRun, profile, analysisScope, showOnlyWarnings);
             }
         }.execute(profile, metricsRun);
-    }
 
-    private List<String> checkWithSDDRAR(MetricsRunImpl metricsRun) {
-        DataSet dataSet = extractDataSet(metricsRun);
-        return SDDRARFacade.checkNewData(dataSet);
-    }
-
-    private DataSet extractDataSet(MetricsRunImpl metricsRun) {
-
-        MetricsResult result = metricsRun.getResultsForCategory(MetricCategory.Class);
-        List<String> entityNames = Arrays.asList(result.getMeasuredObjects());
-        List<String> featureNames = new ArrayList<>();
-        for (Metric metric : result.getMetrics()) {
-            featureNames.add(metric.getAbbreviation());
-        }
-
-        Metric[] metrics = result.getMetrics();
-
-        double[][] data = new double[entityNames.size()][featureNames.size()];
-        for (int i = 0; i < entityNames.size(); i++) {
-            for (int j = 0; j < featureNames.size(); j++) {
-                Metric metric = metrics[j];
-                String entity = entityNames.get(i);
-                Double value = result.getValueForMetric(metric, entity);
-                data[i][j] = value == null ? 0 : value;
-            }
-        }
-
-        DataSet dataSet = new DataSet(MatrixUtils.createRealMatrix(data), entityNames, featureNames);
-        return dataSet;
     }
 
     @Override
