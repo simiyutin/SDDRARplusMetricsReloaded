@@ -112,6 +112,11 @@ public class Rule implements Serializable {
         rule.setBody(ruleBody);
         return rule;
     }
+    public static Rule fromBody(List<Node> body) {
+        Rule rule = new Rule();
+        rule.setBody(body);
+        return rule;
+    }
 
     public List<Node> getBody() {
         return body;

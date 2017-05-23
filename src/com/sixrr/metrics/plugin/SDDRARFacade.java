@@ -5,7 +5,6 @@ import com.sixrr.metrics.Metric;
 import com.sixrr.metrics.MetricCategory;
 import com.sixrr.metrics.metricModel.MetricsResult;
 import com.sixrr.metrics.metricModel.MetricsRun;
-import com.sixrr.metrics.metricModel.MetricsRunImpl;
 import com.sixrr.metrics.profile.MetricInstance;
 import com.sixrr.metrics.profile.MetricsProfile;
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -25,7 +24,8 @@ public class SDDRARFacade {
         DataSet dataSet = extractDataSet(metricsRun);
         CorrelationFilter.filterByFeatureCorrelationRate(dataSet);
         Set<Rule> rules = RuleExtractor.extractRules(dataSet, MIN_CONFIDENCE);
-        SDDRARioHandler.dumpRules(rules);
+        RulePack pack = new RulePack(rules, dataSet.getFeatureNames());
+        SDDRARioHandler.dumpRulePack(pack);
         List<String> interestingMetrics = dataSet.getFeatureNames();
         SDDRARioHandler.dumpMetrics(interestingMetrics);
     }
@@ -33,7 +33,8 @@ public class SDDRARFacade {
     // приходит уже только с нужными метриками
     public static List<String> checkNewData(MetricsRun metricsRun) {
         DataSet dataSet = extractDataSet(metricsRun);
-        Set<Rule> rules = SDDRARioHandler.loadRules();
+        RulePack rulePack = SDDRARioHandler.loadRulePack();
+        Set<Rule> rules = rulePack.fitRulesToDataSet(dataSet);
         List<Integer> faultyIndices = ErrorComputer.getFaultyEntities(dataSet, rules, PERCENTAGE_OF_ERROR_THRESHOLD);
         List<String> names = dataSet.getEntityNames();
         List<String> faultyNames = faultyIndices.stream().map(names::get).collect(Collectors.toList());

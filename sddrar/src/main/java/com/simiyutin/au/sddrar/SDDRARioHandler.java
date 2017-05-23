@@ -10,11 +10,11 @@ public class SDDRARioHandler {
     public static final String METRICS_FILE = "metrics.data";
     private static final String DATA_FOLDER = "/home/boris/au_2/nir/project/data/";
 
-    public static void dumpRules(Set<Rule> rules) {
-        dump(rules, RULES_FILE);
+    public static void dumpRulePack(RulePack pack) {
+        dump(pack, RULES_FILE);
     }
 
-    public static Set<Rule> loadRules() {
+    public static RulePack loadRulePack() {
         return load(RULES_FILE);
     }
 
