@@ -3,9 +3,7 @@ package com.simiyutin.au.sddrar;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -39,7 +37,7 @@ public class ErrorComputer {
         return faulty;
     }
 
-    public static List<Double> getPercentageOfErrors(List<Integer> errors, int numberOfRules) {
+    static List<Double> getPercentageOfErrors(List<Integer> errors, int numberOfRules) {
         List<Double> pe = new ArrayList<>();
         for (int error : errors) {
             pe.add((double) error / numberOfRules);
@@ -49,7 +47,7 @@ public class ErrorComputer {
 
 
 
-    public static List<Integer> getNumberOfErrors(DataSet dataSet, Set<Rule> rules) {
+    static List<Integer> getNumberOfErrors(DataSet dataSet, Set<Rule> rules) {
 
         List<Integer> errors = new ArrayList<>();
 
@@ -64,5 +62,23 @@ public class ErrorComputer {
         }
 
         return errors;
+    }
+
+    public static Map<String, Set<Rule>> getFailedRulesForEachEntity(DataSet dataSet, Set<Rule> rules) {
+        Map<String, Set<Rule>> result = new HashMap<>();
+
+        for (int i = 0; i < dataSet.getMatrix().getRowDimension(); i++) {
+            result.put(dataSet.getEntityNames().get(i), new HashSet<>());
+        }
+
+        for (int i = 0; i < dataSet.getMatrix().getRowDimension(); i++) {
+            for (Rule rule : rules) {
+                if (!rule.check(dataSet.getMatrix().getRow(i))) {
+                    result.get(dataSet.getEntityNames().get(i)).add(rule);
+                }
+            }
+        }
+
+        return result;
     }
 }

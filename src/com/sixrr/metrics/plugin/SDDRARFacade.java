@@ -9,10 +9,7 @@ import com.sixrr.metrics.profile.MetricInstance;
 import com.sixrr.metrics.profile.MetricsProfile;
 import org.apache.commons.math3.linear.MatrixUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -35,11 +32,20 @@ public class SDDRARFacade {
         DataSet dataSet = extractDataSet(metricsRun);
         RulePack rulePack = SDDRARioHandler.loadRulePack();
         Set<Rule> rules = rulePack.fitRulesToDataSet(dataSet);
+
+
         List<Integer> faultyIndices = ErrorComputer.getFaultyEntities(dataSet, rules, PERCENTAGE_OF_ERROR_THRESHOLD);
+
+        Map<Integer, Set<Rule>> failedRules = ErrorComputer.getFailedRulesForEachEntity(dataSet, rules);
         List<String> names = dataSet.getEntityNames();
         List<String> faultyNames = faultyIndices.stream().map(names::get).collect(Collectors.toList());
         return faultyNames;
     }
+
+    // понять какие метрики на что влияют, какие лучшие
+    // но вроде модем взять сразу все и хрен с ним
+    // но нет, потому что на входе отсеиватся только те, у кого было |mean - stedev| < val
+    // вопрос : как определить проблему по проваленным правилам?
 
     public static void selectInterestingMetrics(MetricsProfile profile) {
 

@@ -257,4 +257,20 @@ public class Rule implements Serializable {
                 "body=" + body +
                 "}\n";
     }
+
+    public String toVerboseString(DataSet dataSet) {
+
+        StringBuilder sb = new StringBuilder();
+        List<String> featureNames = dataSet.getFeatureNames();
+
+        for (Node node : body) {
+            if (node.getType() == Type.VALUE) {
+                sb.append(featureNames.get(node.getValue()));
+            } else {
+                sb.append(" ").append(node.getType()).append(" ");
+            }
+        }
+
+        return sb.toString();
+    }
 }
