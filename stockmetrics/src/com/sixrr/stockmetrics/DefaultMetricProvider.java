@@ -118,28 +118,41 @@ public class DefaultMetricProvider implements MetricProvider {
 
     private static PrebuiltMetricProfile createSDDRARProfile() {
         final PrebuiltMetricProfile profile =
-                new PrebuiltMetricProfile("SDDRAR metrics");
+                new PrebuiltMetricProfile("SDDRAR metrics profile 2");
+
+//        profile.addMetric(AfferentCouplingClassMetric.class);
+//        profile.addMetric(DataAbstractionCouplingClassMetric.class);
+//        profile.addMetric(InformationFlowBasedCohesionClassMetric.class);
+//        profile.addMetric(TightClassCouplingMetric.class);
+//        profile.addMetric(LooseClassCouplingMetric.class);
+//        profile.addMetric(LackOfCohesionInMethods1ClassMetric.class);
+//        profile.addMetric(LackOfCohesionInMethods2ClassMetric.class);
+//        profile.addMetric(LackOfCohesionInMethods5ClassMetric.class);
+//        profile.addMetric(LocalityOfDataClassMetric.class);
+//        profile.addMetric(MessagePassingCouplingClassMetric.class);
+//        profile.addMetric(NumMethodsClassMetric.class);
+
+        //
 
         profile.addMetric(CouplingBetweenObjectsClassMetric.class);
-        profile.addMetric(LackOfCohesionOfMethodsClassMetric.class);
-        profile.addMetric(NumAttributesAddedMetric.class);
-        profile.addMetric(NumAttributesInheritedMetric.class);
-        profile.addMetric(NumAttributesInheritedMetric.class);
-        profile.addMetric(NumCommandsClassMetric.class);
-        profile.addMetric(NumOperationsAddedMetric.class);
-        profile.addMetric(NumOperationsInheritedMetric.class);
+        profile.addMetric(LackOfCohesionOfMethodsClassMetric.class); //LCOM 4
+        profile.addMetric(NumAttributesAddedMetric.class); //todo пробное удаление
+        profile.addMetric(NumAttributesInheritedMetric.class); //todo пробное удаление
+        profile.addMetric(NumCommandsClassMetric.class); //todo пробное удаление
+        profile.addMetric(NumOperationsAddedMetric.class); //todo пробное удаление
+        profile.addMetric(NumOperationsInheritedMetric.class); //todo пробное удаление
         profile.addMetric(ResponseForClassMetric.class);
 
         ////////////////////////
 
-        profile.addMetric(NumConstructorsMetric.class);
-        profile.addMetric(AdjustedLevelOrderClassMetric.class);
-        profile.addMetric(LevelOrderClassMetric.class);
-        profile.addMetric(NumOperationsOverriddenMetric.class);
-        profile.addMetric(AverageOperationParametersMetric.class);
+        profile.addMetric(NumConstructorsMetric.class); //todo пробное удаление
+        profile.addMetric(AdjustedLevelOrderClassMetric.class); //todo пробное удаление
+        profile.addMetric(LevelOrderClassMetric.class); //todo пробное удаление
+        profile.addMetric(NumOperationsOverriddenMetric.class); //todo пробное удаление
+        profile.addMetric(AverageOperationParametersMetric.class); //todo пробное удаление
         profile.addMetric(AverageOperationComplexityMetric.class);
-        profile.addMetric(NumDependenciesClassMetric.class);
-        profile.addMetric(NumDependentsClassMetric.class);
+        profile.addMetric(NumDependenciesClassMetric.class); //todo пробное удаление
+        profile.addMetric(NumDependentsClassMetric.class); //todo пробное удаление
 
         //
         profile.addMetric(HalsteadBugsClassMetric.class);
@@ -150,17 +163,6 @@ public class DefaultMetricProvider implements MetricProvider {
         profile.addMetric(HalsteadVolumeClassMetric.class);
 
         //
-        profile.addMetric(AverageOperationComplexityMetric.class);
-        profile.addMetric(AverageOperationParametersMetric.class);
-
-        //
-
-//        profile.addMetric(NumTransitiveDependenciesClassMetric.class);
-//        profile.addMetric(NumTransitiveDependentsClassMetric.class);
-//        profile.addMetric(WeightedMethodComplexityMetric.class);
-
-
-
 
         return profile;
     }

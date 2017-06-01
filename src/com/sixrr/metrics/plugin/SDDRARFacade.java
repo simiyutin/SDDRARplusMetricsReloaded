@@ -22,12 +22,15 @@ public class SDDRARFacade {
 
     public static void trainAndPersistModel(MetricsProfile profile, MetricsRun metricsRun) {
         DataSet dataSet = extractDataSet(metricsRun);
-        CorrelationFilter.filterByFeatureCorrelationRate(dataSet);
+        CorrelationFilter.filterByFeatureCorrelationRate(dataSet); //todo пробное удаление
+        List<String> interestingMetrics = dataSet.getFeatureNames();
+        System.out.println(interestingMetrics);
+        SDDRARioHandler.dumpMetrics(interestingMetrics);
+
         Set<Rule> rules = RuleExtractor.extractRules(dataSet, MIN_CONFIDENCE);
         RulePack pack = new RulePack(rules, dataSet.getFeatureNames());
         SDDRARioHandler.dumpRulePack(pack);
-        List<String> interestingMetrics = dataSet.getFeatureNames();
-        SDDRARioHandler.dumpMetrics(interestingMetrics);
+
     }
 
     // приходит уже только с нужными метриками
