@@ -9,13 +9,16 @@ import com.sixrr.metrics.profile.MetricInstance;
 import com.sixrr.metrics.profile.MetricsProfile;
 import org.apache.commons.math3.linear.MatrixUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
 public class SDDRARFacade {
     private static final double MIN_CONFIDENCE = 0.8;
-    private static final double PERCENTAGE_OF_ERROR_THRESHOLD = 0.9;
+    private static final double PERCENTAGE_OF_ERROR_THRESHOLD = 0.8;
 
     public static void trainAndPersistModel(MetricsProfile profile, MetricsRun metricsRun) {
         DataSet dataSet = extractDataSet(metricsRun);
@@ -36,7 +39,6 @@ public class SDDRARFacade {
 
         List<Integer> faultyIndices = ErrorComputer.getFaultyEntities(dataSet, rules, PERCENTAGE_OF_ERROR_THRESHOLD);
 
-        Map<Integer, Set<Rule>> failedRules = ErrorComputer.getFailedRulesForEachEntity(dataSet, rules);
         List<String> names = dataSet.getEntityNames();
         List<String> faultyNames = faultyIndices.stream().map(names::get).collect(Collectors.toList());
         return faultyNames;

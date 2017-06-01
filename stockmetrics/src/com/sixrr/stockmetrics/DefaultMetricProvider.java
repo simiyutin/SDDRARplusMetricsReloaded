@@ -141,6 +141,25 @@ public class DefaultMetricProvider implements MetricProvider {
         profile.addMetric(NumDependenciesClassMetric.class);
         profile.addMetric(NumDependentsClassMetric.class);
 
+        //
+        profile.addMetric(HalsteadBugsClassMetric.class);
+        profile.addMetric(HalsteadDifficultyClassMetric.class);
+        profile.addMetric(HalsteadEffortClassMetric.class);
+        profile.addMetric(HalsteadLengthClassMetric.class);
+        profile.addMetric(HalsteadVocabularyClassMetric.class);
+        profile.addMetric(HalsteadVolumeClassMetric.class);
+
+        //
+        profile.addMetric(AverageOperationComplexityMetric.class);
+        profile.addMetric(AverageOperationParametersMetric.class);
+
+        //
+
+//        profile.addMetric(NumTransitiveDependenciesClassMetric.class);
+//        profile.addMetric(NumTransitiveDependentsClassMetric.class);
+//        profile.addMetric(WeightedMethodComplexityMetric.class);
+
+
 
 
         return profile;
