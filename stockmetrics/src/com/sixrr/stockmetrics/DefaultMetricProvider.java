@@ -153,14 +153,23 @@ public class DefaultMetricProvider implements MetricProvider {
         profile.addMetric(AverageOperationComplexityMetric.class);
         profile.addMetric(AverageOperationParametersMetric.class);
 
-        //
-
-//        profile.addMetric(NumTransitiveDependenciesClassMetric.class);
-//        profile.addMetric(NumTransitiveDependentsClassMetric.class);
-//        profile.addMetric(WeightedMethodComplexityMetric.class);
-
-
-
+        profile.addMetric(DepthOfInheritanceMetric.class);
+        profile.addMetric(AverageOperationComplexityMetric.class);
+        profile.addMetric(LevelOrderClassMetric.class);
+        profile.addMetric(NumAttributesInheritedMetric.class);
+        profile.addMetric(ClassSizeOperationsMetric.class);
+        profile.addMetric(ClassSizeOperationsAttributesMetric.class);
+        profile.addMetric(ClassSizeAttributesMetric.class);
+        profile.addMetric(HalsteadEffortClassMetric.class);
+        profile.addMetric(AverageOperationSizeMetric.class);
+        profile.addMetric(AdjustedLevelOrderClassMetric.class);
+        profile.addMetric(NumOperationsOverriddenMetric.class);
+        profile.addMetric(MaximumOperationSizeMetric.class);
+        profile.addMetric(MaximumOperationComplexityMetric.class);
+        profile.addMetric(NumInterfacesImplementedMetric.class);
+        profile.addMetric(CommentLinesOfCodeClassMetric.class);
+        profile.addMetric(CouplingBetweenObjectsClassMetric.class);
+        profile.addMetric(NumAttributesAddedMetric.class);
 
         return profile;
     }
