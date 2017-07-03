@@ -120,6 +120,8 @@ public class DefaultMetricProvider implements MetricProvider {
         final PrebuiltMetricProfile profile =
                 new PrebuiltMetricProfile("SDDRAR metrics profile 2");
 
+        //          metrics from paper
+
 //        profile.addMetric(AfferentCouplingClassMetric.class);
 //        profile.addMetric(DataAbstractionCouplingClassMetric.class);
 //        profile.addMetric(InformationFlowBasedCohesionClassMetric.class);
