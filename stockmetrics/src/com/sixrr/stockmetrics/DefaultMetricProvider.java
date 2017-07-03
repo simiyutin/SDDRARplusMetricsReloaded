@@ -128,7 +128,7 @@ public class DefaultMetricProvider implements MetricProvider {
 //        profile.addMetric(LackOfCohesionInMethods1ClassMetric.class);
 //        profile.addMetric(LackOfCohesionInMethods2ClassMetric.class);
 //        profile.addMetric(LackOfCohesionInMethods5ClassMetric.class);
-//        profile.addMetric(LocalityOfDataClassMetric.class);
+        profile.addMetric(LocalityOfDataClassMetric.class);
 //        profile.addMetric(MessagePassingCouplingClassMetric.class);
 //        profile.addMetric(NumMethodsClassMetric.class);
 
